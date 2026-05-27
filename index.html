@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Morning Briefing &middot; Tuesday, May 26, 2026</title>
+  <style>
+    :root {
+      --bg:     #ffffff;
+      --card:   #ffffff;
+      --border: #e5e3de;
+      --ink:    #1c1b19;
+      --muted:  #6b6860;
+      --link:   #1a56db;
+      --tag-bg: #eeecea;
+    }
+    [data-theme="dark"] {
+      --bg:     #141413;
+      --card:   #1e1d1b;
+      --border: #2e2d2a;
+      --ink:    #e8e6e1;
+      --muted:  #8a8780;
+      --link:   #6ea8fe;
+      --tag-bg: #29281f;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { height: auto; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+      overflow: auto;
+      display: block;
+      padding: 1.25rem 1.5rem 2rem;
+      transition: background 0.2s, color 0.2s;
+    }
+    .wrap { max-width: none; width: 100%; }
+
+    /* ── Header ──────────────────────────────────────────── */
+    header {
+      position: relative;
+      text-align: center;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0.65rem;
+    }
+    .greeting { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.15rem; }
+    header h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.02em; }
+    blockquote { margin-top: 0.6rem; }
+    blockquote p {
+      font-size: 0.77rem;
+      font-style: italic;
+      color: var(--muted);
+      white-space: pre-line;
+    }
+    blockquote cite {
+      display: block;
+      font-size: 0.68rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+      font-style: normal;
+    }
+    .theme-toggle {
+      position: absolute; top: 0; right: 0;
+      font-size: 0.68rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      padding: 0.28rem 0.65rem;
+      border: 1px solid var(--border); border-radius: 5px;
+      background: var(--tag-bg); color: var(--muted); cursor: pointer;
+    }
+    .theme-toggle:hover { color: var(--ink); border-color: var(--muted); }
+
+    /* ── Keyword panel ───────────────────────────────────── */
+    .kw-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 0.65rem;
+    }
+    .kw-panel > summary {
+      font-size: 0.66rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.09em;
+      color: var(--muted); padding: 0.6rem 1.1rem;
+      cursor: pointer; user-select: none;
+      list-style: none;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .kw-panel > summary::-webkit-details-marker { display: none; }
+    .kw-panel > summary::after { content: '+'; font-size: 1rem; font-weight: 400; }
+    .kw-panel[open] > summary::after { content: '−'; }
+    .kw-panel-body { padding: 0.2rem 1.1rem 0.75rem; border-top: 1px solid var(--border); }
+    .kw-chips {
+      display: flex; flex-wrap: wrap; gap: 0.4rem;
+      margin: 0.6rem 0 0.55rem; min-height: 1.5rem;
+    }
+    .kw-chip {
+      display: inline-flex; align-items: center; gap: 0.25rem;
+      font-size: 0.72rem; background: var(--tag-bg); color: var(--ink);
+      padding: 0.18rem 0.4rem 0.18rem 0.6rem;
+      border-radius: 99px; border: 1px solid var(--border);
+    }
+    .kw-remove {
+      background: none; border: none; cursor: pointer;
+      color: var(--muted); font-size: 1rem; padding: 0;
+      line-height: 1; display: flex; align-items: center;
+    }
+    .kw-remove:hover { color: var(--ink); }
+    .kw-input-row { display: flex; gap: 0.5rem; }
+    .kw-input {
+      flex: 1; font-size: 0.8rem; padding: 0.3rem 0.6rem;
+      border: 1px solid var(--border); border-radius: 5px;
+      background: var(--bg); color: var(--ink); outline: none;
+    }
+    .kw-input:focus { border-color: var(--link); }
+    .kw-add {
+      font-size: 0.76rem; padding: 0.3rem 0.8rem;
+      border: 1px solid var(--border); border-radius: 5px;
+      background: var(--tag-bg); color: var(--ink);
+      cursor: pointer; white-space: nowrap;
+    }
+    .kw-add:hover { background: var(--border); }
+
+    /* ── News Grid ───────────────────────────────────────── */
+    .grid {
+      height: 60vh;
+      min-height: 380px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 0.65rem;
+      margin-bottom: 1rem;
+    }
+    section {
+      overflow-y: auto;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+    }
+    .grid-endpoints { grid-column: 1;     grid-row: 1 / 3; }
+    .grid-fierce    { grid-column: 2 / 4; grid-row: 1; }
+    .grid-huberman  { grid-column: 2;     grid-row: 2; }
+    .grid-acquired  { grid-column: 3;     grid-row: 2; }
+    section h2 {
+      font-size: 0.62rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.09em;
+      color: var(--muted); margin-bottom: 0.55rem;
+    }
+
+    /* ── Article cards ───────────────────────────────────── */
+    .item-card {
+      display: flex; align-items: baseline; gap: 0.6rem;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 7px; padding: 0.55rem 0.8rem; margin-bottom: 0.35rem;
+      transition: box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+    }
+    .item-card:hover {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      transform: translateY(-1px);
+      border-color: #c0bdb7;
+    }
+    [data-theme="dark"] .item-card:hover {
+      box-shadow: 0 2px 10px rgba(0,0,0,0.35);
+      border-color: #444240;
+    }
+    .card-title {
+      flex: 1; font-size: 0.825rem;
+      color: var(--ink); text-decoration: none; min-width: 0;
+    }
+    .card-title:hover { color: var(--link); }
+    .card-date { font-size: 0.67rem; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+
+    /* ── Category tags ───────────────────────────────────── */
+    .tag {
+      font-size: 0.58rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      padding: 0.16rem 0.45rem; border-radius: 4px;
+      flex-shrink: 0; white-space: nowrap;
+    }
+    .tag-pharma  { color: #1d4ed8; background: #eff6ff; }
+    .tag-biotech { color: #15803d; background: #f0fdf4; }
+    .tag-devices { color: #6d28d9; background: #f5f3ff; }
+    .tag-podcast { color: #c2410c; background: #fff7ed; }
+    .tag-essay   { color: #991b1b; background: #fef2f2; }
+    [data-theme="dark"] .tag-pharma  { color: #93c5fd; background: #1e3a5f; }
+    [data-theme="dark"] .tag-biotech { color: #86efac; background: #14532d; }
+    [data-theme="dark"] .tag-devices { color: #c4b5fd; background: #2e1065; }
+    [data-theme="dark"] .tag-podcast { color: #fdba74; background: #431407; }
+    [data-theme="dark"] .tag-essay   { color: #fca5a5; background: #450a0a; }
+
+    /* ── Paul Graham bar ─────────────────────────────────── */
+    .pg-bar {
+      display: flex; align-items: center; gap: 0.65rem;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.5rem 1rem;
+      margin-bottom: 0.65rem;
+    }
+    .pg-link {
+      font-size: 0.83rem; color: var(--ink); text-decoration: none;
+      flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .pg-link:hover { color: var(--link); }
+    .pg-source { font-size: 0.68rem; color: var(--muted); white-space: nowrap; }
+
+    /* ── Keyword highlight ───────────────────────────────── */
+    mark { background: #fef9c3; color: inherit; font-weight: 600; border-radius: 2px; padding: 0 1px; }
+    [data-theme="dark"] mark { background: #78350f; color: #fde68a; }
+
+    /* ── Stocks ──────────────────────────────────────────── */
+    .stocks-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      margin-bottom: 1rem;
+    }
+    .stocks-section h2 {
+      font-size: 0.62rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.09em;
+      color: var(--muted); margin-bottom: 0.65rem;
+    }
+    .stock-group-label {
+      font-size: 0.6rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.07em;
+      color: var(--muted); margin-bottom: 0.4rem; margin-top: 0.65rem;
+    }
+    .stock-group-label:first-of-type { margin-top: 0; }
+    .stock-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 0.5rem;
+      margin-bottom: 0.1rem;
+    }
+    .stock-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 0.6rem 0.8rem;
+      display: flex; flex-direction: column; gap: 0.2rem;
+    }
+    .stock-ticker {
+      font-size: 0.72rem; font-weight: 700; color: var(--ink);
+      letter-spacing: 0.03em;
+    }
+    .stock-name {
+      font-size: 0.6rem; color: var(--muted); white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+    }
+    .stock-price {
+      font-size: 0.88rem; font-weight: 600; color: var(--ink);
+      margin-top: 0.1rem;
+    }
+    .stock-change { font-size: 0.72rem; font-weight: 600; }
+    .up   { color: #15803d; }
+    .down { color: #b91c1c; }
+    [data-theme="dark"] .up   { color: #86efac; }
+    [data-theme="dark"] .down { color: #fca5a5; }
+
+    /* ── Watchlist ───────────────────────────────────────── */
+    .watchlist-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      margin-bottom: 1rem;
+    }
+    .watchlist-section h2 {
+      font-size: 0.62rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.09em;
+      color: var(--muted); margin-bottom: 0.65rem;
+    }
+    .watchlist-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+    }
+    .watchlist-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+    }
+    .watchlist-card-header {
+      display: flex; align-items: center; gap: 0.5rem;
+      margin-bottom: 0.4rem;
+    }
+    .watchlist-company { font-size: 0.88rem; font-weight: 700; color: var(--ink); }
+    .private-badge {
+      font-size: 0.56rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      padding: 0.14rem 0.4rem; border-radius: 4px;
+      color: #6d28d9; background: #f5f3ff;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    [data-theme="dark"] .private-badge { color: #c4b5fd; background: #2e1065; }
+    .watchlist-news {
+      border-top: 1px solid var(--border);
+      padding-top: 0.5rem; margin-top: 0.4rem;
+    }
+    .watchlist-news-item { margin-bottom: 0.35rem; }
+    .watchlist-news-item a {
+      font-size: 0.78rem; color: var(--ink); text-decoration: none;
+      display: block; line-height: 1.4;
+    }
+    .watchlist-news-item a:hover { color: var(--link); }
+    .watchlist-news-item .news-date {
+      font-size: 0.63rem; color: var(--muted); margin-top: 0.1rem;
+    }
+    .news-loading, .news-empty {
+      font-size: 0.72rem; color: var(--muted); font-style: italic;
+    }
+    .wl-add-row { display: flex; gap: 0.5rem; margin-bottom: 0.85rem; }
+    .wl-input {
+      flex: 1; font-size: 0.8rem; padding: 0.3rem 0.6rem;
+      border: 1px solid var(--border); border-radius: 5px;
+      background: var(--bg); color: var(--ink); outline: none;
+    }
+    .wl-input:focus { border-color: var(--link); }
+    .wl-add {
+      font-size: 0.76rem; padding: 0.3rem 0.8rem;
+      border: 1px solid var(--border); border-radius: 5px;
+      background: var(--tag-bg); color: var(--ink);
+      cursor: pointer; white-space: nowrap;
+    }
+    .wl-add:hover { background: var(--border); }
+    .wl-remove {
+      background: none; border: none; cursor: pointer;
+      color: var(--muted); font-size: 1.15rem; padding: 0;
+      line-height: 1; margin-left: auto;
+      display: flex; align-items: center;
+    }
+    .wl-remove:hover { color: var(--ink); }
+
+    /* ── Tabs ────────────────────────────────────────────── */
+    .tabs {
+      display: flex; gap: 0.4rem;
+      margin-bottom: 0.65rem;
+    }
+    .tab-button {
+      font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 0.42rem 0.95rem;
+      border: 1px solid var(--border); border-radius: 7px;
+      background: var(--card); color: var(--muted);
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+    .tab-button:hover { color: var(--ink); border-color: var(--muted); }
+    .tab-button.active {
+      background: var(--tag-bg); color: var(--ink);
+      border-color: var(--muted);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Reading Journal ─────────────────────────────────── */
+    .journal-note-block {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      margin-bottom: 1rem;
+    }
+    .journal-note-label {
+      font-size: 0.62rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.09em;
+      color: var(--muted); margin-bottom: 0.5rem;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .journal-save-status {
+      font-size: 0.62rem; color: var(--muted);
+      font-weight: 400; letter-spacing: 0; text-transform: none;
+      font-style: italic;
+    }
+    .journal-textarea {
+      width: 100%; min-height: 220px;
+      font-family: inherit; font-size: 0.85rem; line-height: 1.55;
+      padding: 0.7rem 0.85rem;
+      background: var(--bg); color: var(--ink);
+      border: 1px solid var(--border); border-radius: 7px;
+      resize: vertical; outline: none;
+      transition: border-color 0.15s ease;
+    }
+    .journal-textarea:focus { border-color: var(--link); }
+    .journal-past-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      margin-bottom: 1rem;
+    }
+    .journal-past-section h2 {
+      font-size: 0.62rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.09em;
+      color: var(--muted); margin-bottom: 0.65rem;
+    }
+    .journal-search {
+      width: 100%; font-size: 0.8rem;
+      padding: 0.35rem 0.65rem;
+      border: 1px solid var(--border); border-radius: 5px;
+      background: var(--bg); color: var(--ink); outline: none;
+      margin-bottom: 0.7rem;
+      transition: border-color 0.15s ease;
+    }
+    .journal-search:focus { border-color: var(--link); }
+    .journal-entry-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 0.7rem 0.9rem;
+      margin-bottom: 0.45rem;
+      transition: box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+    }
+    .journal-entry-card:hover {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      transform: translateY(-1px);
+      border-color: #c0bdb7;
+    }
+    [data-theme="dark"] .journal-entry-card:hover {
+      box-shadow: 0 2px 10px rgba(0,0,0,0.35);
+      border-color: #444240;
+    }
+    .journal-entry-header {
+      display: flex; align-items: baseline; gap: 0.6rem;
+      margin-bottom: 0.35rem;
+    }
+    .journal-entry-title {
+      flex: 1; font-size: 0.83rem; font-weight: 600;
+      color: var(--ink); text-decoration: none;
+      min-width: 0;
+    }
+    .journal-entry-title:hover { color: var(--link); }
+    .journal-entry-date {
+      font-size: 0.65rem; color: var(--muted);
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .journal-entry-note {
+      font-size: 0.78rem; color: var(--ink);
+      white-space: pre-wrap; line-height: 1.5;
+    }
+
+    /* ── Misc ────────────────────────────────────────────── */
+    .msg { font-size: 0.8rem; color: var(--muted); padding: 0.25rem 0; }
+    .error { color: #b91c1c; }
+    [data-theme="dark"] .error { color: #fca5a5; }
+    footer {
+      text-align: center; font-size: 0.67rem; color: var(--muted);
+      padding: 0.4rem 0 0; border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <header>
+      <p class="greeting" id="greeting">Good morning, Ella.</p>
+      <h1 id="today-date">Tuesday, May 26, 2026</h1>
+      <blockquote>
+        <p>The Brain — is wider than the Sky —</p>
+        <cite>&mdash; Emily Dickinson</cite>
+      </blockquote>
+      <button class="theme-toggle" onclick="toggleTheme()">Dark</button>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab-button" type="button" data-tab="briefing">Briefing</button>
+      <button class="tab-button" type="button" data-tab="journal">Reading Journal</button>
+    </nav>
+
+    <div class="tab-panel" data-tab="briefing">
+      <details class="kw-panel">
+        <summary>Keywords <span id="kw-count"></span></summary>
+        <div class="kw-panel-body">
+          <div id="kw-chips" class="kw-chips"></div>
+          <div class="kw-input-row">
+            <input id="kw-input" class="kw-input" type="text"
+                   placeholder="Add a keyword&hellip;" autocomplete="off" />
+            <button id="kw-add-btn" class="kw-add" type="button">Add</button>
+          </div>
+        </div>
+      </details>
+
+      <div class="grid">
+      <section class="grid-endpoints">
+        <h2>Endpoints News</h2>
+        <p class="msg">No new items in the last 36 hours.</p>
+        <p class="msg">No new items in the last 36 hours.</p>
+        <p class="msg">No new items in the last 36 hours.</p>
+      </section>
+
+      <section class="grid-fierce">
+        <h2>Fierce Biotech</h2>
+        <article class="item-card"><span class="tag tag-biotech">Biotech</span><a href="https://www.fiercebiotech.com/devices/olympus-pushes-deeper-oncology-270m-bioprotect-deal" class="card-title" target="_blank" rel="noopener">Olympus pushes deeper into oncology with $270M BioProtect deal</a></article>
+        <article class="item-card"><span class="tag tag-biotech">Biotech</span><a href="https://www.fiercebiotech.com/biotech/calls-coins-act-expansion-grow-new-rules-sweep-china-biotech-licensing" class="card-title" target="_blank" rel="noopener">As calls for COINS Act expansion grow, will new rules sweep up China biotech licensing?</a></article>
+        <article class="item-card"><span class="tag tag-biotech">Biotech</span><a href="https://www.fiercebiotech.com/biotech/makarys-fda-reforms-continue-move-forward-agency-adjusts-leadership-turnover" class="card-title" target="_blank" rel="noopener">Makary’s FDA reforms ‘continue to move forward’ despite leadership turmoil</a></article>
+        <article class="item-card"><span class="tag tag-biotech">Biotech</span><a href="https://www.fiercebiotech.com/biotech/kura-posts-krazati-combo-data-drug-designed-unleash-kras-inhibitors-potential" class="card-title" target="_blank" rel="noopener">Kura posts Krazati combo data on drug designed to unleash KRAS inhibitors’ potential</a></article>
+        <article class="item-card"><span class="tag tag-biotech">Biotech</span><a href="https://www.fiercebiotech.com/biotech/eli-lilly-inks-deals-buy-3-vaccine-developers-38b" class="card-title" target="_blank" rel="noopener">Lilly inks deals to buy 3 vaccine developers for up to $3.8B as M&amp;A spree continues</a></article>
+        <article class="item-card"><span class="tag tag-biotech">Biotech</span><a href="https://www.fiercebiotech.com/biotech/facing-looming-xtandi-patent-cliff-astellas-pins-hopes-more-deals-while-still-cutting-costs" class="card-title" target="_blank" rel="noopener">Facing looming Xtandi patent cliff, Astellas pins hopes on more deals while still cutting costs</a></article>
+        <article class="item-card"><span class="tag tag-biotech">Biotech</span><a href="https://www.fiercebiotech.com/biotech/lilly-preps-ph-2-launch-after-verve-gene-editor-cuts-cholesterol-par-pcsk9-inhibitors" class="card-title" target="_blank" rel="noopener">Lilly preps for ph. 2 launch after Verve gene editor cuts cholesterol on par with PCSK9 inhibitors</a></article>
+        <article class="item-card"><span class="tag tag-biotech">Biotech</span><a href="https://www.fiercebiotech.com/biotech/bioage-ceo-talks-nlrp3-and-pipeline-pill-ambitions" class="card-title" target="_blank" rel="noopener">BioAge CEO talks NLRP3 and ‘pipeline in a pill’ ambitions</a></article>
+        <article class="item-card"><span class="tag tag-biotech">Biotech</span><a href="https://www.fiercebiotech.com/biotech/chutes-ladders-former-fda-leader-takes-new-biotech-turn" class="card-title" target="_blank" rel="noopener">Chutes &amp; Ladders—Former FDA leader takes new biotech Turn</a></article>
+        <article class="item-card"><span class="tag tag-biotech">Biotech</span><a href="https://www.fiercebiotech.com/biotech/has-novartis-t-charge-been-overtaken-vivo-car-ts-execs-argue-theres-room-both" class="card-title" target="_blank" rel="noopener">Has Novartis’ T-Charge been overtaken by in vivo CAR-Ts? Execs argue there’s room for both</a></article>
+        <article class="item-card"><span class="tag tag-biotech">Biotech</span><a href="https://www.fiercebiotech.com/biotech/ose-turns-heat-ovarian-cancer-phase-2-keytruda-supported-win" class="card-title" target="_blank" rel="noopener">OSE turns up the heat on ovarian cancer with phase 2, Keytruda-supported win</a></article>
+        <article class="item-card"><span class="tag tag-biotech">Biotech</span><a href="https://www.fiercebiotech.com/biotech/biogen-axes-denali-partnered-parkinsons-prospect-after-phase-2-flop" class="card-title" target="_blank" rel="noopener">Biogen axes Denali-partnered Parkinson’s prospect after phase 2 flop</a></article>
+        <article class="item-card"><span class="tag tag-biotech">Biotech</span><a href="https://www.fiercebiotech.com/pharma/merck-kelun-sac-tmt-adc-combo-beats-keytruda-65-progression-first-line-lung-cancer" class="card-title" target="_blank" rel="noopener">ASCO: Merck, Kelun&#x27;s sac-TMT ADC combo beats Keytruda by 65% on progression in first-line lung cancer</a></article>
+        <article class="item-card"><span class="tag tag-biotech">Biotech</span><a href="https://www.fiercebiotech.com/biotech/betting-biotech-prediction-markets-set-sights-clinical-trials" class="card-title" target="_blank" rel="noopener">Betting on biotech: Prediction markets set sights on clinical trials</a></article>
+        <article class="item-card"><span class="tag tag-biotech">Biotech</span><a href="https://www.fiercebiotech.com/biotech/eli-lillys-triple-g-drug-drives-deep-weight-loss-phase-3-obesity-trial" class="card-title" target="_blank" rel="noopener">Lilly’s triple-G drug helps patients lose roughly a quarter of weight, showcasing competitive profile</a></article>
+        <article class="item-card"><span class="tag tag-biotech">Biotech</span><a href="https://www.fiercebiotech.com/biotech/struggling-liminatus-pays-320m-stock-car-t-biotech-innocs-ai" class="card-title" target="_blank" rel="noopener">Struggling Liminatus pays $320M in stock for CAR-T biotech InnocsAI</a></article>
+        <article class="item-card"><span class="tag tag-biotech">Biotech</span><a href="https://www.fiercebiotech.com/biotech/infex-following-insmeds-footsteps-advances-lung-disease-candidate-after-clearing-phase-2a" class="card-title" target="_blank" rel="noopener">Infex, following in Insmed’s footsteps, advances lung disease candidate after clearing phase 2a</a></article>
+        <article class="item-card"><span class="tag tag-biotech">Biotech</span><a href="https://www.fiercebiotech.com/biotech/us-taps-small-san-diego-biotech-experimental-ebola-treatment-epidemic-worsens" class="card-title" target="_blank" rel="noopener">US taps small San Diego biotech for experimental Ebola treatment as epidemic worsens</a></article>
+        <article class="item-card"><span class="tag tag-biotech">Biotech</span><a href="https://www.fiercebiotech.com/medtech/medtronic-inks-650m-deal-spr-therapeutics" class="card-title" target="_blank" rel="noopener">Medtronic inks $650M deal for SPR Therapeutics</a></article>
+        <article class="item-card"><span class="tag tag-biotech">Biotech</span><a href="https://www.fiercebiotech.com/finance/gho-capital-cbc-group-plan-merge-forming-21b-healthcare-investment-firm" class="card-title" target="_blank" rel="noopener">GHO Capital, CBC Group plan to merge, forming $21B healthcare investment firm</a></article>
+        <article class="item-card"><span class="tag tag-biotech">Biotech</span><a href="https://www.fiercebiotech.com/medtech/qiagen-links-chip-giant-nvidia-propel-ai-use-drug-discovery" class="card-title" target="_blank" rel="noopener">Qiagen links with chip giant Nvidia to propel AI use in drug discovery</a></article>
+        <article class="item-card"><span class="tag tag-biotech">Biotech</span><a href="https://www.fiercebiotech.com/biotech/busy-lilly-closes-202m-deal-preclinical-dna-delivery-biotech-engage" class="card-title" target="_blank" rel="noopener">Lilly pens $202M deal for preclinical DNA delivery biotech Engage as M&amp;A streak continues</a></article>
+        <article class="item-card"><span class="tag tag-biotech">Biotech</span><a href="https://www.fiercebiotech.com/biotech/30m-launch-oorja-bio-breathes-new-life-south-korean-fibrosis-candidate" class="card-title" target="_blank" rel="noopener">With $30M launch, Oorja Bio breathes new life into South Korean fibrosis candidate</a></article>
+        <article class="item-card"><span class="tag tag-biotech">Biotech</span><a href="https://www.fiercebiotech.com/biotech/incyte-pays-genesis-80m-expand-ai-fueled-drug-discovery-pact" class="card-title" target="_blank" rel="noopener">Incyte pays Genesis $80M to expand AI-fueled drug discovery pact</a></article>
+        <article class="item-card"><span class="tag tag-biotech">Biotech</span><a href="https://www.fiercebiotech.com/pharma/bristol-myers-taps-anthropic-claude-enterprise-wide-ai-adoption-speed-drug-rd-global" class="card-title" target="_blank" rel="noopener">BMS taps Anthropic’s Claude for enterprise-wide AI adoption to speed R&amp;D, global workflows</a></article>
+      </section>
+
+      <section class="grid-huberman">
+        <h2>Huberman Lab</h2>
+        <article class="item-card"><span class="tag tag-podcast">Podcast</span><a href="https://www.hubermanlab.com/episode/build-muscle-great-posture-and-resilience-to-injury-jeff-cavaliere" class="card-title" target="_blank" rel="noopener">Build Muscle, Great Posture &amp; Resilience to Injury | Jeff Cavaliere</a><span class="card-date">May 25, 2026</span></article>
+        <article class="item-card"><span class="tag tag-podcast">Podcast</span><a href="https://www.hubermanlab.com/episode/essentials-the-science-of-learning-and-speaking-languages-eddie-chang" class="card-title" target="_blank" rel="noopener">Essentials: The Science of Learning &amp; Speaking Languages | Dr. Eddie Chang</a><span class="card-date">May 21, 2026</span></article>
+        <article class="item-card"><span class="tag tag-podcast">Podcast</span><a href="https://www.hubermanlab.com/episode/how-to-overcome-social-anxiety-nick-epley" class="card-title" target="_blank" rel="noopener">How to Overcome Social Anxiety | Dr. Nick Epley</a><span class="card-date">May 18, 2026</span></article>
+      </section>
+
+      <section class="grid-acquired">
+        <h2>Acquired</h2>
+        <article class="item-card"><span class="tag tag-podcast">Podcast</span><a href="https://www.acquired.fm/episodes/vanguard" class="card-title" target="_blank" rel="noopener">Vanguard</a><span class="card-date">May 18, 2026</span></article>
+        <article class="item-card"><span class="tag tag-podcast">Podcast</span><a href="https://www.acquired.fm/episodes/ferrari" class="card-title" target="_blank" rel="noopener">Ferrari</a><span class="card-date">Apr 13, 2026</span></article>
+        <article class="item-card"><span class="tag tag-podcast">Podcast</span><a href="https://www.acquired.fm/episodes/formula-1" class="card-title" target="_blank" rel="noopener">Formula 1</a><span class="card-date">Mar 2, 2026</span></article>
+      </section>
+      </div>
+
+      <div class="stocks-section">
+        <h2>Stocks</h2>
+      <p class="stock-group-label">Market &amp; Tech</p>
+      <div class="stock-row">
+        <div class="stock-card"><span class="stock-ticker">^GSPC</span><span class="stock-name">S&amp;P 500</span><span class="stock-price">7,519.12</span><span class="stock-change up">+0.61%</span></div>
+        <div class="stock-card"><span class="stock-ticker">AAPL</span><span class="stock-name">Apple</span><span class="stock-price">$308.33</span><span class="stock-change down">-0.16%</span></div>
+        <div class="stock-card"><span class="stock-ticker">NVDA</span><span class="stock-name">Nvidia</span><span class="stock-price">$214.86</span><span class="stock-change down">-0.22%</span></div>
+      </div>
+      <p class="stock-group-label">Pharma &amp; Health</p>
+      <div class="stock-row">
+        <div class="stock-card"><span class="stock-ticker">MRK</span><span class="stock-name">Merck</span><span class="stock-price">$119.72</span><span class="stock-change down">-2.20%</span></div>
+        <div class="stock-card"><span class="stock-ticker">JNJ</span><span class="stock-name">Johnson &amp; Johnson</span><span class="stock-price">$230.18</span><span class="stock-change down">-1.78%</span></div>
+        <div class="stock-card"><span class="stock-ticker">NVO</span><span class="stock-name">Novo Nordisk</span><span class="stock-price">$44.19</span><span class="stock-change down">-1.71%</span></div>
+        <div class="stock-card"><span class="stock-ticker">PFE</span><span class="stock-name">Pfizer</span><span class="stock-price">$25.85</span><span class="stock-change down">-0.19%</span></div>
+        <div class="stock-card"><span class="stock-ticker">LLY</span><span class="stock-name">Eli Lilly</span><span class="stock-price">$1,064.74</span><span class="stock-change down">-0.02%</span></div>
+        <div class="stock-card"><span class="stock-ticker">HIMS</span><span class="stock-name">Hims &amp; Hers</span><span class="stock-price">$23.85</span><span class="stock-change up">+0.42%</span></div>
+        <div class="stock-card"><span class="stock-ticker">OSCR</span><span class="stock-name">Oscar Health</span><span class="stock-price">$21.89</span><span class="stock-change down">-3.31%</span></div>
+      </div>
+      </div>
+
+      <div class="watchlist-section">
+        <h2>Watchlist &mdash; Private Companies</h2>
+        <div class="wl-add-row">
+          <input id="wl-input" class="wl-input" type="text"
+                 placeholder="Add a company&hellip;" autocomplete="off" />
+          <button id="wl-add-btn" class="wl-add" type="button">Add</button>
+        </div>
+        <div id="watchlist-grid" class="watchlist-grid"></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-tab="journal">
+      <div class="pg-bar">
+        <span class="tag tag-essay">Today's Essay</span>
+        <a href="http://paulgraham.com/ds.html" class="pg-link" target="_blank" rel="noopener">Do Things That Don&#x27;t Scale</a>
+        <span class="pg-source">paulgraham.com</span>
+      </div>
+
+      <div class="journal-note-block">
+        <div class="journal-note-label">
+          <span>End your notes</span>
+          <span class="journal-save-status" id="journal-save-status"></span>
+        </div>
+        <textarea id="journal-textarea" class="journal-textarea"
+                  placeholder="Write your thoughts on this essay&hellip;"
+                  spellcheck="true"></textarea>
+      </div>
+
+      <div class="journal-past-section">
+        <h2>Past Entries</h2>
+        <input id="journal-search" class="journal-search" type="text"
+               placeholder="Search by essay title or date&hellip;" autocomplete="off" />
+        <div id="journal-past-list"></div>
+      </div>
+    </div>
+
+    <footer>Generated at 4:36 PM &middot; 31 items</footer>
+  </div>
+  <script>
+    const DEFAULT_COMPANIES = ["Oura", "Anthropic", "OpenAI", "Whoop", "Ro", "Pomelo Care"];
+    const WATCHLIST_NEWS_CACHE = {"oura": [{"title": "Finnish smart ring maker Oura plans IPO at over \u20ac9 billion valuation - Euronews.com", "link": "https://news.google.com/rss/articles/CBMiygFBVV95cUxNOXVZYkVmN1VTSDNGNDBnWXRrQXpoR1cwUWxER29DWnIwQkdtV2Y1OTJYYjA1RFBsVWZaNklQclB2eEVHNEVIMVpLS1FidHVYeWtYcGE5S2IzOU1xeG1hSXpzOTNOYTJSeF9IZFE1SzdLc3NhMjV1aUYwN1hsaXBfa2t0UWRFcjl3cXZKYXZsclcwMDBlQTd0OHktLWJHTzdyNUM3U1F4YlZUUlNMRENUSWJCY0VvdHlselJtek8yQVZmWmV6dVlvZGRR?oc=5", "date": "May 25, 2026"}, {"title": "I Tested The Best Smart Rings Of 2026: Here Are My Top Picks - Forbes", "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxPN3E4VHNtdzJmdXYxZDlsY3ozdlNrc0ZWNU1BbE9BVWE5MDdLZTNHdkZjWG8tRk5VOXpwYWNROXZva29tMFZOVTBYbmRBbmtCNVJ6Uno1bENrcUJKRldiS0lIZjQ1azZtVW9CcmdLWEdVV24yWTZ5NXBzeDc5eVZIZE04NA?oc=5", "date": "May 21, 2026"}], "anthropic": [{"title": "How we contain Claude across products - Anthropic", "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE16Q1A1LU9QUFNJNWgxdkI4ei1iaHEwN2gzTjNmT2s2MV9icExhR3hYWHRMWWFUVUpJUTBhcl9HV3doZnRlcVVZd0ZWV0NlWDVNcTRLeDNJMlpWRFhDd3BWcUpyektXUC10V29N?oc=5", "date": "May 25, 2026"}, {"title": "Anthropic prepares Mythos 1 for Claude Code and Claude Security - TestingCatalog AI News", "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxOMUVXeTM4c1FFdXpsQTVlNXhEN29LYlA1cUg5Ul9TWXE0T1Bnd2E2Vm5scHEtRlFiazFqYWNXY2trMktQMDVoeGdOQTRQaExndWdaQ2dhN0tqS00ya1pFS3NtTEJxdFNtZG9ISDE3R3d6LUl3UV9rbUVNN0g2QThPYmFrV3hpM04zMTEtUXZQcXE0RS14ZExqd0J6SQ?oc=5", "date": "May 23, 2026"}], "openai": [{"title": "OpenAI Targets Smaller Advertisers With New ChatGPT Ads - The Information", "link": "https://news.google.com/rss/articles/CBMiigFBVV95cUxQMDNUYWlVNlRKRTR3dFcyZ2g0cE91cXA1NUpidnVoR0RDREFqcVRFSE82R3A5dkFTRGhXVWNUaks1Q0hGZWtyTXgwQkdwZmNPR3VISVljMkVnclFqUlA4NzVhQkpjQ2JZaHJ3czRTazZKRkR6anlBeTByOHdhaTlSM3RJSTdabk1MS3c?oc=5", "date": "May 26, 2026"}, {"title": "As OpenAI\u2019s ChatGPT ad delivery improves, the doubts it created aren\u2019t so easily fixed - Digiday", "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNaXNFMG5nWXV2YVVDaXdLc2I5Mm52RzR1R09qcGFpNTdQbnZsemVGUlF1NVBSUnczYmg0NUpNNGpkdzB4LXl5YmNhTGs3T0t6cEJmS2JXT2JJR0d0Sl9XMF83NUU1eEhxblhfeGM0UjFaNVNHQnVLbjcybTY2bVcwazUtZmk1UXZCb0dyT2ZKaE9JVmhuVUZSZ01CLUVtRE0tRU5DNFk0UnVoNnNHS3g4ZmtZemo?oc=5", "date": "May 26, 2026"}], "whoop": [{"title": "WHOOP Body: Future of Wearable Technology - WHOOP", "link": "https://news.google.com/rss/articles/CBMiggFBVV95cUxQWk9sUEppdm1QQ3d1aVBsQnh2YzB1aW9KWlIwbDZqaWZ4ZFdTbE5tNU04dGJpcDM5ZEI2a2hiNVBWUk5TakkwXzEzVXljUUhjVU5YT2lUQWxibnBaX213MDRLaUIyaUZJWWZ4RDVXOW5VZ0ZOemZ3c3JFdXhKbU0zMm1R?oc=5", "date": "May 22, 2026"}, {"title": "Google\u2019s Fitbit Air Gives Whoop Some Serious Competition - Athletech News", "link": "https://news.google.com/rss/articles/CBMiigFBVV95cUxPZXpycTVzdGQxMW9Xb2F3VXRNajhNS0xwLWVsbmJpcWp4MWpwMzUwSllMclZVSUVBV0NtTTg3S2pDb3I0ZWF4aVUzMWt5dVlEQUpwdXFfZ1BxZV80ZHc1R3Nydk0ybzFtdi14MHllRmZfeGVOQzBNaDhmSGVMTHpNWmxyQ29RRjE1cUE?oc=5", "date": "May 26, 2026"}], "ro": [{"title": "Ro Body: Weight Loss Medication Review (2026) - Forbes", "link": "https://news.google.com/rss/articles/CBMickFVX3lxTE5qbUkwNlppaGllTk9uQ1V0WkNveTRhVlVBRDNJanJySkRUTE1iUXNRbHhibzMzMW10alVmWDBQN3BDRHJib0ZSalNUdFAzeENicXBmQVNLcm5RS1VWOWJJQVRjdWI2R19GZ0UtVWsyblNZUQ?oc=5", "date": "May 21, 2026"}, {"title": "Ro Launches Wegovy\u00ae Pill Through Integration with Novo Nordisk - Ro", "link": "https://news.google.com/rss/articles/CBMiR0FVX3lxTE54bjY2VXI5VWZDWDRiQm9Fdndad0xCcGFxYzRKcVIwYk1jY2ZLQnhNbU5JYWszX1hzTE5URGMydzFaQmk0dkZj?oc=5", "date": "Jan 5, 2026"}], "pomelo care": [{"title": "Pomelo Care banks $92M to expand virtual women's health, pediatric care services - Fierce Healthcare", "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQWGh1YjZJakU4YktTYW53TzRTV3Z4bkFNZGNXSUQ0VmZSalJHXzY2emNYcVRrcXU1dXQtdmxGc3FBdmVlWjhlaktuVDFpRXlCMXRaRk5YXzRjemJLdHdZVElBSXZRbHQtZVJKT3RxcFllMEp6V2ZRQlE5aS1fSkxPdVRBcFd5c1VTNlBtNnpKMHNOQlpJcHlUWXVVV2FxUkg2N2dLRV9ENElMbGs5VzhXWVE4MXRhWkVNTGZr?oc=5", "date": "Jan 8, 2026"}, {"title": "Pomelo Care\u2019s Valuation Soars To $1.7 Billion As It Plans Expansion Beyond Maternal Care - Forbes", "link": "https://news.google.com/rss/articles/CBMi2gFBVV95cUxOSXQyVGlfX1VRbXI0bUZJdkl1UFZEUWQzUUFUTWRlakRmc3hsSnV6ZWtzVUJYRWRDM2JseE10VUphbWhxcW14MTFRUzRpX3gzNWFFbFJ3b0plSW00UVI5UTUzckc1alBYUmN6NGdmdkx0cldZdm1XVEhOWGo4Wnd6T2VEdXduNlh5Qm9LWjYyalVKYzdtLWQzNFRFa0YzaXJ1eWRsX2NmcWJmNTV6ekU3TEowTmhFeDNQZ29UeHl1UU1UVEhsUlI5U0dTbWVYU2w0Tk1aX2Y4VXBsZw?oc=5", "date": "Jan 8, 2026"}]};
+    const CURRENT_ESSAY = {"title": "Do Things That Don't Scale", "url": "http://paulgraham.com/ds.html"};
+
+    /* ── Theme ───────────────────────────────────────────── */
+    function initTheme() {
+      const t = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t);
+      document.querySelector('.theme-toggle').textContent = t === 'dark' ? 'Light' : 'Dark';
+    }
+    function toggleTheme() {
+      const cur = document.documentElement.getAttribute('data-theme');
+      const next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      document.querySelector('.theme-toggle').textContent = next === 'dark' ? 'Light' : 'Dark';
+    }
+
+    /* ── Greeting ─────────────────────────────────────────── */
+    function setGreeting() {
+      const h = new Date().getHours();
+      const s = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+      document.getElementById('greeting').textContent = s + ', Ella.';
+    }
+
+    /* ── Today's date ─────────────────────────────────────── */
+    // Re-derives the date from the client clock so a tab that's been left
+    // open across midnight (or a stubbornly cached page) self-corrects.
+    function setDate() {
+      const formatted = new Date().toLocaleDateString('en-US', {
+        weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+      });
+      const el = document.getElementById('today-date');
+      if (el) el.textContent = formatted;
+      document.title = 'Morning Briefing · ' + formatted;
+    }
+
+    /* ── Util ─────────────────────────────────────────────── */
+    function htmlEsc(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    /* ── Keywords ─────────────────────────────────────────── */
+    const DEFAULT_KWS = ['AI', 'wearable', 'FDA', 'clinical trial', 'biotech', "women's health", 'digital health'];
+
+    function loadKws() {
+      const s = localStorage.getItem('kw_keywords');
+      if (s === null) return [...DEFAULT_KWS];
+      try {
+        const parsed = JSON.parse(s);
+        return Array.isArray(parsed) ? parsed : [...DEFAULT_KWS];
+      } catch (e) {
+        localStorage.removeItem('kw_keywords');
+        return [...DEFAULT_KWS];
+      }
+    }
+    function saveKws(kws) { localStorage.setItem('kw_keywords', JSON.stringify(kws)); }
+
+    function applyHighlights(kws) {
+      document.querySelectorAll('.card-title').forEach(el => {
+        if (!el.dataset.orig) el.dataset.orig = el.textContent;
+        const text = el.dataset.orig;
+        if (!kws.length) { el.textContent = text; return; }
+        const pattern = kws
+          .map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+          .sort((a, b) => b.length - a.length)
+          .join('|');
+        el.innerHTML = htmlEsc(text).replace(new RegExp('(' + pattern + ')', 'gi'), '<mark>$1</mark>');
+      });
+    }
+
+    function renderKws() {
+      const kws = loadKws();
+      const container = document.getElementById('kw-chips');
+      container.innerHTML = '';
+      kws.forEach(kw => {
+        const chip = document.createElement('span');
+        chip.className = 'kw-chip';
+        chip.textContent = kw;
+        const btn = document.createElement('button');
+        btn.className = 'kw-remove';
+        btn.textContent = '×';
+        btn.setAttribute('aria-label', 'Remove ' + kw);
+        btn.addEventListener('click', () => removeKw(kw));
+        chip.appendChild(btn);
+        container.appendChild(chip);
+      });
+      const ct = document.getElementById('kw-count');
+      ct.textContent = kws.length ? '(' + kws.length + ')' : '';
+      applyHighlights(kws);
+    }
+
+    function addKeyword() {
+      const input = document.getElementById('kw-input');
+      const kw = input.value.trim();
+      if (!kw) return;
+      const kws = loadKws();
+      if (!kws.some(k => k.toLowerCase() === kw.toLowerCase())) {
+        kws.push(kw);
+        saveKws(kws);
+      }
+      input.value = '';
+      renderKws();
+    }
+
+    function removeKw(kw) {
+      saveKws(loadKws().filter(k => k !== kw));
+      renderKws();
+    }
+
+
+    /* ── Watchlist (dynamic) ─────────────────────────────── */
+    function loadCompanies() {
+      const s = localStorage.getItem('watchlist_companies');
+      if (s === null) return [...DEFAULT_COMPANIES];
+      try {
+        const parsed = JSON.parse(s);
+        return Array.isArray(parsed) ? parsed : [...DEFAULT_COMPANIES];
+      } catch (e) {
+        localStorage.removeItem('watchlist_companies');
+        return [...DEFAULT_COMPANIES];
+      }
+    }
+    function saveCompanies(list) {
+      localStorage.setItem('watchlist_companies', JSON.stringify(list));
+    }
+
+    function fmtNewsDate(str) {
+      if (!str) return '';
+      const d = new Date(str);
+      return isNaN(d) ? str : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function renderNewsItems(items) {
+      return items.map(it => `
+        <div class="watchlist-news-item">
+          <a href="${htmlEsc(it.link)}" target="_blank" rel="noopener">${htmlEsc(it.title)}</a>
+          <div class="news-date">${htmlEsc(fmtNewsDate(it.date))}</div>
+        </div>`).join('');
+    }
+
+    async function fetchCompanyNews(query) {
+      // Prefer the local Python proxy when available — it bypasses CORS,
+      // applies query enrichment, and filters by topic keywords.
+      try {
+        const r = await fetch('/api/news?q=' + encodeURIComponent(query));
+        if (r.ok && (r.headers.get('Content-Type') || '').includes('application/json')) {
+          return await r.json();
+        }
+      } catch (e) { /* proxy not running — fall through */ }
+      // Direct browser fetch (will be CORS-blocked from file:// or any origin
+      // that news.google.com does not whitelist).
+      const url = 'https://news.google.com/rss/search?q=' + encodeURIComponent(query) + '&hl=en-US&gl=US&ceid=US:en';
+      const res = await fetch(url);
+      const xml = new DOMParser().parseFromString(await res.text(), 'text/xml');
+      return Array.from(xml.querySelectorAll('item')).slice(0, 2).map(el => ({
+        title: el.querySelector('title')?.textContent?.trim() || 'Untitled',
+        link:  el.querySelector('link')?.textContent?.trim() || '#',
+        date:  el.querySelector('pubDate')?.textContent?.trim() || '',
+      }));
+    }
+
+    async function loadCompanyNewsInto(container, name) {
+      const cacheKey = name.toLowerCase();
+      if (WATCHLIST_NEWS_CACHE[cacheKey]) {
+        const cached = WATCHLIST_NEWS_CACHE[cacheKey];
+        container.innerHTML = cached.length
+          ? renderNewsItems(cached)
+          : '<div class="news-empty">No recent headlines.</div>';
+        return;
+      }
+      try {
+        const items = await fetchCompanyNews(name);
+        container.innerHTML = items.length
+          ? renderNewsItems(items)
+          : '<div class="news-empty">No recent headlines.</div>';
+      } catch (e) {
+        container.innerHTML = '<div class="news-empty">News unavailable (CORS or network error).</div>';
+      }
+    }
+
+    function renderWatchlist() {
+      const companies = loadCompanies();
+      const grid = document.getElementById('watchlist-grid');
+      grid.innerHTML = '';
+      companies.forEach(name => {
+        const card = document.createElement('div');
+        card.className = 'watchlist-card';
+        card.innerHTML = `
+          <div class="watchlist-card-header">
+            <span class="watchlist-company"></span>
+            <span class="private-badge">Private</span>
+            <button class="wl-remove" type="button" aria-label="Remove">×</button>
+          </div>
+          <div class="watchlist-news">
+            <div class="news-loading">Loading headlines&hellip;</div>
+          </div>`;
+        card.querySelector('.watchlist-company').textContent = name;
+        card.querySelector('.wl-remove').addEventListener('click', () => removeCompany(name));
+        const newsEl = card.querySelector('.watchlist-news');
+        grid.appendChild(card);
+        loadCompanyNewsInto(newsEl, name);
+      });
+    }
+
+    function addCompany() {
+      const input = document.getElementById('wl-input');
+      const name = input.value.trim();
+      if (!name) return;
+      const list = loadCompanies();
+      if (!list.some(n => n.toLowerCase() === name.toLowerCase())) {
+        list.push(name);
+        saveCompanies(list);
+      }
+      input.value = '';
+      renderWatchlist();
+    }
+
+    function removeCompany(name) {
+      saveCompanies(loadCompanies().filter(n => n !== name));
+      renderWatchlist();
+    }
+
+    /* ── Tabs ─────────────────────────────────────────────── */
+    const TAB_KEY = 'active_tab';
+
+    function showTab(name) {
+      document.querySelectorAll('.tab-panel').forEach(p => {
+        p.classList.toggle('active', p.dataset.tab === name);
+      });
+      document.querySelectorAll('.tab-button').forEach(b => {
+        b.classList.toggle('active', b.dataset.tab === name);
+      });
+      localStorage.setItem(TAB_KEY, name);
+    }
+
+    function initTabs() {
+      document.querySelectorAll('.tab-button').forEach(b => {
+        b.addEventListener('click', () => showTab(b.dataset.tab));
+      });
+      const saved = localStorage.getItem(TAB_KEY) || 'briefing';
+      showTab(saved);
+    }
+
+    /* ── Reading Journal ──────────────────────────────────── */
+    const JOURNAL_KEY = 'journal_entries';
+
+    function loadJournal() {
+      const s = localStorage.getItem(JOURNAL_KEY);
+      if (!s) return {};
+      try {
+        const parsed = JSON.parse(s);
+        return (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) ? parsed : {};
+      } catch (e) {
+        localStorage.removeItem(JOURNAL_KEY);
+        return {};
+      }
+    }
+    function saveJournal(map) { localStorage.setItem(JOURNAL_KEY, JSON.stringify(map)); }
+
+    function formatJournalDate(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      if (isNaN(d)) return iso;
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    let _journalSaveTimer = null;
+    function setJournalStatus(text) {
+      const status = document.getElementById('journal-save-status');
+      if (status) status.textContent = text;
+    }
+
+    function scheduleJournalSave(value) {
+      clearTimeout(_journalSaveTimer);
+      setJournalStatus('Saving…');
+      _journalSaveTimer = setTimeout(() => {
+        const map = loadJournal();
+        if (!value.trim()) {
+          delete map[CURRENT_ESSAY.url];
+        } else {
+          map[CURRENT_ESSAY.url] = {
+            url: CURRENT_ESSAY.url,
+            title: CURRENT_ESSAY.title,
+            note: value,
+            date: new Date().toISOString(),
+          };
+        }
+        saveJournal(map);
+        setJournalStatus('Saved');
+        renderPastEntries();
+        setTimeout(() => {
+          const status = document.getElementById('journal-save-status');
+          if (status && status.textContent === 'Saved') status.textContent = '';
+        }, 1500);
+      }, 500);
+    }
+
+    function renderPastEntries() {
+      const container = document.getElementById('journal-past-list');
+      if (!container) return;
+      const searchEl = document.getElementById('journal-search');
+      const search = (searchEl?.value || '').trim().toLowerCase();
+      const entries = Object.values(loadJournal())
+        .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      const filtered = search
+        ? entries.filter(e =>
+            (e.title || '').toLowerCase().includes(search) ||
+            formatJournalDate(e.date).toLowerCase().includes(search))
+        : entries;
+      if (!filtered.length) {
+        container.innerHTML = '<div class="news-empty">' +
+          (entries.length ? 'No matches.' : 'No saved notes yet.') + '</div>';
+        return;
+      }
+      container.innerHTML = filtered.map(e => `
+        <article class="journal-entry-card">
+          <div class="journal-entry-header">
+            <a href="${htmlEsc(e.url || '#')}" class="journal-entry-title" target="_blank" rel="noopener">${htmlEsc(e.title || 'Untitled')}</a>
+            <span class="journal-entry-date">${htmlEsc(formatJournalDate(e.date))}</span>
+          </div>
+          <div class="journal-entry-note">${htmlEsc(e.note || '')}</div>
+        </article>`).join('');
+    }
+
+    function initJournal() {
+      const ta = document.getElementById('journal-textarea');
+      if (!ta) return;
+      const existing = loadJournal()[CURRENT_ESSAY.url];
+      if (existing && existing.note) ta.value = existing.note;
+      ta.addEventListener('input', () => scheduleJournalSave(ta.value));
+      const search = document.getElementById('journal-search');
+      if (search) search.addEventListener('input', renderPastEntries);
+      renderPastEntries();
+    }
+
+    /* ── Init ─────────────────────────────────────────────── */
+    function init() {
+      initTheme();
+      setGreeting();
+      setDate();
+      initTabs();
+
+      const kwInput = document.getElementById('kw-input');
+      const kwAddBtn = document.getElementById('kw-add-btn');
+      if (kwAddBtn) kwAddBtn.addEventListener('click', addKeyword);
+      if (kwInput) kwInput.addEventListener('keydown', e => { if (e.key === 'Enter') addKeyword(); });
+
+      const wlInput = document.getElementById('wl-input');
+      const wlAddBtn = document.getElementById('wl-add-btn');
+      if (wlAddBtn) wlAddBtn.addEventListener('click', addCompany);
+      if (wlInput) wlInput.addEventListener('keydown', e => { if (e.key === 'Enter') addCompany(); });
+
+      renderKws();
+      renderWatchlist();
+      initJournal();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+</body>
+</html>
