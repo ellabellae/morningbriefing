@@ -1,5 +1,7 @@
 # Morning Briefing
 
+Built with claude code-
+
 A single-command, local-only morning dashboard. Fetches live RSS feeds,
 public-equity prices, and Google News for a private-company watchlist,
 then opens a dense, themed HTML page in the browser. Everything runs on
